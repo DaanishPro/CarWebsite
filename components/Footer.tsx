@@ -29,13 +29,13 @@ export default function Footer() {
             <div className="lg:col-span-1">
               <Link 
                 href="/home" 
-                className="flex items-center gap-3 text-2xl font-display font-bold text-theme-secondary-400 hover:text-theme-secondary-300 transition-colors duration-300 group"
+                className="flex items-center gap-3 text-2xl font-display font-bold text-[#C62020] hover:text-[#C62020] transition-colors duration-300 group"
               >
                 <div className="relative">
                   <Car className="h-8 w-8 group-hover:scale-110 transition-transform duration-300" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-theme-secondary-400 rounded-full animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#C62020] rounded-full animate-pulse"></div>
                 </div>
-                <span className="gradient-text-secondary">
+                <span className=" text-[#C62020]">
                   YeloCar
                 </span>
               </Link>

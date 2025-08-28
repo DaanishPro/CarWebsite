@@ -16,19 +16,27 @@ interface Feature {
   icon?: React.ElementType
 }
 
-interface FeatureCardProps {
+export interface CarData {
   id: string
-  imageSrc: string
-  imageAlt: string
   name: string
   description: string
   price: number
   discount?: number
+  imageSrc: string
+  imageAlt: string
+  type: "Sedan" | "SUV" | "Hatchback" | "Sports" | "Electric" | "Vintage" | "Luxury" | "Compact"
   mainFeatures: Feature[]
-  category?: string
-  location?: string
-  year?: number
-  mileage?: string
+  fuelType: string
+  mileage: string
+  transmission: string
+  category: string
+  location: string
+  year: number
+}
+
+interface FeatureCardProps extends CarData {
+  onBookNowClick: (carId: string) => void
+  onLearnMoreClick: (carId: string) => void
 }
 
 export default function FeatureCard({
@@ -44,43 +52,12 @@ export default function FeatureCard({
   location = "Mumbai",
   year = 2023,
   mileage = "15,000 km",
+  onBookNowClick,
+  onLearnMoreClick,
 }: FeatureCardProps) {
   const discountedPrice = discount ? price - discount : price
   const { user } = useAuth()
   const router = useRouter()
-
-  const handleBuyNow = async () => {
-    if (!user) {
-      toast.error("Please sign in to buy a car.")
-      router.push("/auth/signin")
-    } else {
-      // Track interaction
-      await databaseUtils.saveFeatureInteraction({
-        userId: user.uid,
-        featureId: id,
-        action: 'contact',
-        timestamp: new Date().toISOString(),
-      })
-
-      toast.success(`You clicked Buy Now for ${name}! (Placeholder action)`)
-      // Implement actual buying logic here
-    }
-  }
-
-  const handleViewDetails = async () => {
-    // Track view interaction
-    if (user) {
-      await databaseUtils.saveFeatureInteraction({
-        userId: user.uid,
-        featureId: id,
-        action: 'view',
-        timestamp: new Date().toISOString(),
-      })
-    }
-
-    toast.success(`Viewing details for ${name}`)
-    // Navigate to detailed view
-  }
 
   const handleLike = async () => {
     if (!user) {
@@ -89,7 +66,6 @@ export default function FeatureCard({
       return
     }
 
-    // Track like interaction
     await databaseUtils.saveFeatureInteraction({
       userId: user.uid,
       featureId: id,
@@ -109,7 +85,6 @@ export default function FeatureCard({
       whileHover={{ y: -5 }}
     >
       <Card className="w-full max-w-sm rounded-2xl overflow-hidden shadow-soft hover:shadow-large transition-all duration-500 bg-gradient-card border-0 group-hover:border-theme-primary-200/50 relative">
-        {/* Gradient Border Effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
 
         <div className="relative w-full h-48 overflow-hidden">
@@ -120,11 +95,8 @@ export default function FeatureCard({
             style={{ objectFit: "cover" }}
             className="rounded-t-2xl group-hover:scale-110 transition-transform duration-700"
           />
-
-          {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-          {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {discount && (
               <motion.div
@@ -155,7 +127,6 @@ export default function FeatureCard({
             </motion.div>
           </div>
 
-          {/* Action Buttons */}
           <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
             <motion.button
               className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-theme-accent-700 hover:text-red-500 hover:bg-white transition-all duration-200"
@@ -169,7 +140,7 @@ export default function FeatureCard({
               className="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-theme-accent-700 hover:text-blue-500 hover:bg-white transition-all duration-200"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={handleViewDetails}
+              onClick={() => onLearnMoreClick(id)}
             >
               <Eye className="h-4 w-4" />
             </motion.button>
@@ -186,7 +157,6 @@ export default function FeatureCard({
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4 pb-4">
-          {/* Car Details */}
           <div className="flex items-center justify-between text-xs text-gray-500">
             <div className="flex items-center gap-1">
               <MapPin className="h-3 w-3" />
@@ -202,7 +172,6 @@ export default function FeatureCard({
             </div>
           </div>
 
-          {/* Price Section */}
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-display font-bold gradient-text-primary">
               ₹{discountedPrice.toLocaleString("en-IN")}
@@ -214,7 +183,6 @@ export default function FeatureCard({
             )}
           </div>
 
-          {/* Features List */}
           <div className="space-y-2">
             {mainFeatures.slice(0, 3).map((feature, index) => (
               <motion.div
@@ -232,7 +200,6 @@ export default function FeatureCard({
             ))}
           </div>
 
-          {/* Rating */}
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="h-4 w-4 text-theme-secondary-400 fill-current" />
@@ -243,7 +210,7 @@ export default function FeatureCard({
 
         <CardFooter className="pt-0 flex gap-2">
           <Button
-            onClick={handleViewDetails}
+            onClick={() => onLearnMoreClick(id)}
             variant="ghost"
             className="flex-1 border border-yellow-500 text-yellow-600 bg-white/90 hover:bg-yellow-500 hover:text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-md"
           >
@@ -251,14 +218,13 @@ export default function FeatureCard({
             Learn More
           </Button>
           <Button
-            onClick={handleBuyNow}
+            onClick={() => onBookNowClick(id)}
             className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-xl group-hover:shadow-glow"
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
-            Buy Now
+            Book Now
           </Button>
         </CardFooter>
-
       </Card>
     </motion.div>
   )

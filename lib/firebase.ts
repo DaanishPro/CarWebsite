@@ -1,31 +1,46 @@
-import { ref, set, get, push, remove, onValue, off, DataSnapshot, query, orderByChild, limitToLast } from "firebase/database"
-import { realtimeDb } from "@/firebase/config"
-import { toast } from "react-hot-toast"
+import { ref, set, get, push, remove, onValue, off, DataSnapshot, query, orderByChild, limitToLast } from "firebase/database";
+import { realtimeDb } from "@/firebase/config";
+import { toast } from "react-hot-toast";
 
 // User interface for database operations
 interface UserData {
-  uid: string
-  email: string
-  fullName: string
-  phoneNumber: string
-  createdAt: string
+  uid: string;
+  email: string;
+  fullName: string;
+  phoneNumber: string;
+  createdAt: string;
 }
 
 // Contact form interface
 interface ContactFormData {
-  name: string
-  email: string
-  phone: string
-  message: string
-  createdAt: string
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  createdAt: string;
 }
 
 // Feature interaction interface
 interface FeatureInteraction {
-  userId: string
-  featureId: string
-  action: 'view' | 'like' | 'share' | 'contact'
-  timestamp: string
+  userId: string;
+  featureId: string;
+  action: 'view' | 'like' | 'share' | 'contact';
+  timestamp: string;
+}
+
+// New interface for Booking data
+interface BookingFormData {
+  fullName: string;
+  phoneNumber: string;
+  emailAddress: string;
+  carModel: string;
+  preferredVariant: string;
+  bookingDate: string;
+  city: string;
+  paymentPreference: string;
+  agreedToTerms: boolean;
+  sendUpdates: boolean;
+  createdAt: string;
 }
 
 // Database utility functions
@@ -34,22 +49,22 @@ export const databaseUtils = {
   saveUserData: async (userData: UserData): Promise<boolean> => {
     try {
       if (!navigator.onLine) {
-        throw new Error("You are offline. Please check your internet connection.")
+        throw new Error("You are offline. Please check your internet connection.");
       }
 
-      const userRef = ref(realtimeDb, `users/${userData.uid}`)
+      const userRef = ref(realtimeDb, `users/${userData.uid}`);
       await set(userRef, {
         ...userData,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
-      })
+      });
       
-      toast.success("User data saved successfully!")
-      return true
+      toast.success("User data saved successfully!");
+      return true;
     } catch (error: any) {
-      console.error("Error saving user data:", error)
-      toast.error(error.message || "Failed to save user data")
-      return false
+      console.error("Error saving user data:", error);
+      toast.error(error.message || "Failed to save user data");
+      return false;
     }
   },
 
@@ -57,21 +72,21 @@ export const databaseUtils = {
   getUserData: async (uid: string): Promise<UserData | null> => {
     try {
       if (!navigator.onLine) {
-        throw new Error("You are offline. Please check your internet connection.")
+        throw new Error("You are offline. Please check your internet connection.");
       }
 
-      const userRef = ref(realtimeDb, `users/${uid}`)
-      const snapshot = await get(userRef)
+      const userRef = ref(realtimeDb, `users/${uid}`);
+      const snapshot = await get(userRef);
       
       if (snapshot.exists()) {
-        return snapshot.val() as UserData
+        return snapshot.val() as UserData;
       }
       
-      return null
+      return null;
     } catch (error: any) {
-      console.error("Error getting user data:", error)
-      toast.error(error.message || "Failed to get user data")
-      return null
+      console.error("Error getting user data:", error);
+      toast.error(error.message || "Failed to get user data");
+      return null;
     }
   },
 
@@ -79,21 +94,21 @@ export const databaseUtils = {
   updateUserData: async (uid: string, updates: Partial<UserData>): Promise<boolean> => {
     try {
       if (!navigator.onLine) {
-        throw new Error("You are offline. Please check your internet connection.")
+        throw new Error("You are offline. Please check your internet connection.");
       }
 
-      const userRef = ref(realtimeDb, `users/${uid}`)
+      const userRef = ref(realtimeDb, `users/${uid}`);
       await set(userRef, {
         ...updates,
         updatedAt: new Date().toISOString()
-      }, { merge: true })
+      }, { merge: true });
       
-      toast.success("User data updated successfully!")
-      return true
+      toast.success("User data updated successfully!");
+      return true;
     } catch (error: any) {
-      console.error("Error updating user data:", error)
-      toast.error(error.message || "Failed to update user data")
-      return false
+      console.error("Error updating user data:", error);
+      toast.error(error.message || "Failed to update user data");
+      return false;
     }
   },
 
@@ -101,43 +116,43 @@ export const databaseUtils = {
   deleteUserData: async (uid: string): Promise<boolean> => {
     try {
       if (!navigator.onLine) {
-        throw new Error("You are offline. Please check your internet connection.")
+        throw new Error("You are offline. Please check your internet connection.");
       }
 
-      const userRef = ref(realtimeDb, `users/${uid}`)
-      await remove(userRef)
+      const userRef = ref(realtimeDb, `users/${uid}`);
+      await remove(userRef);
       
-      toast.success("User data deleted successfully!")
-      return true
+      toast.success("User data deleted successfully!");
+      return true;
     } catch (error: any) {
-      console.error("Error deleting user data:", error)
-      toast.error(error.message || "Failed to delete user data")
-      return false
+      console.error("Error deleting user data:", error);
+      toast.error(error.message || "Failed to delete user data");
+      return false;
     }
   },
 
   // Listen to user data changes in real-time
   listenToUserData: (uid: string, callback: (data: UserData | null) => void) => {
     try {
-      const userRef = ref(realtimeDb, `users/${uid}`)
+      const userRef = ref(realtimeDb, `users/${uid}`);
       
       const unsubscribe = onValue(userRef, (snapshot: DataSnapshot) => {
         if (snapshot.exists()) {
-          callback(snapshot.val() as UserData)
+          callback(snapshot.val() as UserData);
         } else {
-          callback(null)
+          callback(null);
         }
       }, (error) => {
-        console.error("Error listening to user data:", error)
-        toast.error("Failed to listen to user data changes")
-        callback(null)
-      })
+        console.error("Error listening to user data:", error);
+        toast.error("Failed to listen to user data changes");
+        callback(null);
+      });
 
-      return unsubscribe
+      return unsubscribe;
     } catch (error: any) {
-      console.error("Error setting up user data listener:", error)
-      toast.error("Failed to set up user data listener")
-      return () => {}
+      console.error("Error setting up user data listener:", error);
+      toast.error("Failed to set up user data listener");
+      return () => {};
     }
   },
 
@@ -145,24 +160,49 @@ export const databaseUtils = {
   saveContactForm: async (formData: ContactFormData): Promise<boolean> => {
     try {
       if (!navigator.onLine) {
-        throw new Error("You are offline. Please check your internet connection.")
+        throw new Error("You are offline. Please check your internet connection.");
       }
 
-      const contactRef = ref(realtimeDb, 'contactForms')
-      const newContactRef = push(contactRef)
+      const contactRef = ref(realtimeDb, 'contactForms');
+      const newContactRef = push(contactRef);
       
       await set(newContactRef, {
         ...formData,
         createdAt: new Date().toISOString(),
         id: newContactRef.key
-      })
+      });
       
-      toast.success("Contact form submitted successfully!")
-      return true
+      toast.success("Contact form submitted successfully!");
+      return true;
     } catch (error: any) {
-      console.error("Error saving contact form:", error)
-      toast.error(error.message || "Failed to submit contact form")
-      return false
+      console.error("Error saving contact form:", error);
+      toast.error(error.message || "Failed to submit contact form");
+      return false;
+    }
+  },
+
+  // Save contact message in the specified format: message/[user_id]/FullName,Contactno.,Email,Message
+  saveContactMessage: async (userId: string, messageData: {
+    FullName: string;
+    Contactno: string;
+    Email: string;
+    Message: string;
+    createdAt: string;
+  }): Promise<boolean> => {
+    try {
+      if (!navigator.onLine) {
+        throw new Error("You are offline. Please check your internet connection.");
+      }
+
+      const messageRef = ref(realtimeDb, `message/${userId}`);
+      
+      await set(messageRef, messageData);
+      
+      return true;
+    } catch (error: any) {
+      console.error("Error saving contact message:", error);
+      toast.error(error.message || "Failed to save contact message");
+      return false;
     }
   },
 
@@ -170,56 +210,56 @@ export const databaseUtils = {
   getContactForms: async (): Promise<ContactFormData[]> => {
     try {
       if (!navigator.onLine) {
-        throw new Error("You are offline. Please check your internet connection.")
+        throw new Error("You are offline. Please check your internet connection.");
       }
 
-      const contactRef = ref(realtimeDb, 'contactForms')
-      const contactQuery = query(contactRef, orderByChild('createdAt'), limitToLast(50))
-      const snapshot = await get(contactQuery)
+      const contactRef = ref(realtimeDb, 'contactForms');
+      const contactQuery = query(contactRef, orderByChild('createdAt'), limitToLast(50));
+      const snapshot = await get(contactQuery);
       
       if (snapshot.exists()) {
-        const forms: ContactFormData[] = []
+        const forms: ContactFormData[] = [];
         snapshot.forEach((childSnapshot) => {
-          forms.push(childSnapshot.val() as ContactFormData)
-        })
-        return forms.reverse() // Most recent first
+          forms.push(childSnapshot.val() as ContactFormData);
+        });
+        return forms.reverse(); // Most recent first
       }
       
-      return []
+      return [];
     } catch (error: any) {
-      console.error("Error getting contact forms:", error)
-      toast.error(error.message || "Failed to get contact forms")
-      return []
+      console.error("Error getting contact forms:", error);
+      toast.error(error.message || "Failed to get contact forms");
+      return [];
     }
   },
 
   // Listen to contact forms in real-time (admin function)
   listenToContactForms: (callback: (forms: ContactFormData[]) => void) => {
     try {
-      const contactRef = ref(realtimeDb, 'contactForms')
-      const contactQuery = query(contactRef, orderByChild('createdAt'), limitToLast(50))
+      const contactRef = ref(realtimeDb, 'contactForms');
+      const contactQuery = query(contactRef, orderByChild('createdAt'), limitToLast(50));
       
       const unsubscribe = onValue(contactQuery, (snapshot: DataSnapshot) => {
         if (snapshot.exists()) {
-          const forms: ContactFormData[] = []
+          const forms: ContactFormData[] = [];
           snapshot.forEach((childSnapshot) => {
-            forms.push(childSnapshot.val() as ContactFormData)
-          })
-          callback(forms.reverse()) // Most recent first
+            forms.push(childSnapshot.val() as ContactFormData);
+          });
+          callback(forms.reverse()); // Most recent first
         } else {
-          callback([])
+          callback([]);
         }
       }, (error) => {
-        console.error("Error listening to contact forms:", error)
-        toast.error("Failed to listen to contact forms")
-        callback([])
-      })
+        console.error("Error listening to contact forms:", error);
+        toast.error("Failed to listen to contact forms");
+        callback([]);
+      });
 
-      return unsubscribe
+      return unsubscribe;
     } catch (error: any) {
-      console.error("Error setting up contact forms listener:", error)
-      toast.error("Failed to set up contact forms listener")
-      return () => {}
+      console.error("Error setting up contact forms listener:", error);
+      toast.error("Failed to set up contact forms listener");
+      return () => {};
     }
   },
 
@@ -227,22 +267,22 @@ export const databaseUtils = {
   saveFeatureInteraction: async (interaction: FeatureInteraction): Promise<boolean> => {
     try {
       if (!navigator.onLine) {
-        throw new Error("You are offline. Please check your internet connection.")
+        throw new Error("You are offline. Please check your internet connection.");
       }
 
-      const interactionRef = ref(realtimeDb, 'featureInteractions')
-      const newInteractionRef = push(interactionRef)
+      const interactionRef = ref(realtimeDb, 'featureInteractions');
+      const newInteractionRef = push(interactionRef);
       
       await set(newInteractionRef, {
         ...interaction,
         timestamp: new Date().toISOString(),
         id: newInteractionRef.key
-      })
+      });
       
-      return true
+      return true;
     } catch (error: any) {
-      console.error("Error saving feature interaction:", error)
-      return false
+      console.error("Error saving feature interaction:", error);
+      return false;
     }
   },
 
@@ -250,89 +290,114 @@ export const databaseUtils = {
   getFeatureInteractions: async (featureId?: string): Promise<FeatureInteraction[]> => {
     try {
       if (!navigator.onLine) {
-        throw new Error("You are offline. Please check your internet connection.")
+        throw new Error("You are offline. Please check your internet connection.");
       }
 
-      const interactionRef = ref(realtimeDb, 'featureInteractions')
-      const interactionQuery = query(interactionRef, orderByChild('timestamp'), limitToLast(100))
-      const snapshot = await get(interactionQuery)
+      const interactionRef = ref(realtimeDb, 'featureInteractions');
+      const interactionQuery = query(interactionRef, orderByChild('timestamp'), limitToLast(100));
+      const snapshot = await get(interactionQuery);
       
       if (snapshot.exists()) {
-        const interactions: FeatureInteraction[] = []
+        const interactions: FeatureInteraction[] = [];
         snapshot.forEach((childSnapshot) => {
-          const interaction = childSnapshot.val() as FeatureInteraction
+          const interaction = childSnapshot.val() as FeatureInteraction;
           if (!featureId || interaction.featureId === featureId) {
-            interactions.push(interaction)
+            interactions.push(interaction);
           }
-        })
-        return interactions.reverse() // Most recent first
+        });
+        return interactions.reverse(); // Most recent first
       }
       
-      return []
+      return [];
     } catch (error: any) {
-      console.error("Error getting feature interactions:", error)
-      return []
+      console.error("Error getting feature interactions:", error);
+      return [];
     }
   },
 
   // Listen to feature interactions in real-time
   listenToFeatureInteractions: (callback: (interactions: FeatureInteraction[]) => void) => {
     try {
-      const interactionRef = ref(realtimeDb, 'featureInteractions')
-      const interactionQuery = query(interactionRef, orderByChild('timestamp'), limitToLast(100))
+      const interactionRef = ref(realtimeDb, 'featureInteractions');
+      const interactionQuery = query(interactionRef, orderByChild('timestamp'), limitToLast(100));
       
       const unsubscribe = onValue(interactionQuery, (snapshot: DataSnapshot) => {
         if (snapshot.exists()) {
-          const interactions: FeatureInteraction[] = []
+          const interactions: FeatureInteraction[] = [];
           snapshot.forEach((childSnapshot) => {
-            interactions.push(childSnapshot.val() as FeatureInteraction)
-          })
-          callback(interactions.reverse()) // Most recent first
+            interactions.push(childSnapshot.val() as FeatureInteraction);
+          });
+          callback(interactions.reverse()); // Most recent first
         } else {
-          callback([])
+          callback([]);
         }
       }, (error) => {
-        console.error("Error listening to feature interactions:", error)
-        callback([])
-      })
+        console.error("Error listening to feature interactions:", error);
+        callback([]);
+      });
 
-      return unsubscribe
+      return unsubscribe;
     } catch (error: any) {
-      console.error("Error setting up feature interactions listener:", error)
-      return () => {}
+      console.error("Error setting up feature interactions listener:", error);
+      return () => {};
     }
   },
 
   // Check database connectivity
   checkConnectivity: async (): Promise<boolean> => {
     try {
-      const testRef = ref(realtimeDb, '.info/connected')
-      const snapshot = await get(testRef)
-      return snapshot.val() === true
+      const testRef = ref(realtimeDb, '.info/connected');
+      const snapshot = await get(testRef);
+      return snapshot.val() === true;
     } catch (error) {
-      console.error("Database connectivity check failed:", error)
-      return false
+      console.error("Database connectivity check failed:", error);
+      return false;
     }
   },
 
   // Listen to database connectivity
   listenToConnectivity: (callback: (isConnected: boolean) => void) => {
     try {
-      const connectedRef = ref(realtimeDb, '.info/connected')
+      const connectedRef = ref(realtimeDb, '.info/connected');
       
       const unsubscribe = onValue(connectedRef, (snapshot: DataSnapshot) => {
-        callback(snapshot.val() === true)
+        callback(snapshot.val() === true);
       }, (error) => {
-        console.error("Error listening to connectivity:", error)
-        callback(false)
-      })
+        console.error("Error listening to connectivity:", error);
+        callback(false);
+      });
 
-      return unsubscribe
+      return unsubscribe;
     } catch (error: any) {
-      console.error("Error setting up connectivity listener:", error)
-      return () => {}
+      console.error("Error setting up connectivity listener:", error);
+      return () => {};
     }
-  }
-}
+  },
 
-export default databaseUtils 
+  // New function to save car booking data
+  saveBookingData: async (userId: string, bookingData: BookingFormData): Promise<boolean> => {
+    try {
+      if (!navigator.onLine) {
+        throw new Error("You are offline. Please check your internet connection.");
+      }
+
+      const bookingRef = ref(realtimeDb, `BookingCar/${userId}`);
+      const newBookingRef = push(bookingRef);
+
+      await set(newBookingRef, {
+        ...bookingData,
+        createdAt: new Date().toISOString(),
+        id: newBookingRef.key
+      });
+
+      toast.success("Booking submitted successfully!");
+      return true;
+    } catch (error: any) {
+      console.error("Error saving booking data:", error);
+      toast.error(error.message || "Failed to submit booking");
+      return false;
+    }
+  },
+};
+
+export default databaseUtils;

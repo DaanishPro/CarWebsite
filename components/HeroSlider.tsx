@@ -114,7 +114,7 @@ export default function HeroSlider() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8 animate-fade-in-up">
+          {/* <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8 animate-fade-in-up">
             <Button 
               size="lg"
               className="bg-gradient-secondary hover:bg-gradient-secondary text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
@@ -129,7 +129,7 @@ export default function HeroSlider() {
             >
               Learn More
             </Button>
-          </div>
+          </div> */}
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 pt-12 animate-fade-in-up">

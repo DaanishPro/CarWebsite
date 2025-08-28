@@ -32,10 +32,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Function to fetch user profile from both Firestore and Realtime Database
+  // Function to fetch user profile with optimized loading
   const fetchUserProfile = async (currentUser: User) => {
     try {
-      // Try to get user data from Realtime Database first
+      // Set loading to false immediately for better UX
+      setLoading(false)
+      
+      // Try to get user data from Realtime Database first (faster)
       const realtimeData = await databaseUtils.getUserData(currentUser.uid)
       
       if (realtimeData) {
@@ -50,14 +53,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       if (docSnap.exists()) {
         const firestoreData = docSnap.data() as UserProfile
         
-        // Save to Realtime Database for future use
-        await databaseUtils.saveUserData({
+        // Save to Realtime Database for future use (async, don't wait)
+        databaseUtils.saveUserData({
           uid: currentUser.uid,
           email: currentUser.email || "",
           fullName: firestoreData.fullName || "",
           phoneNumber: firestoreData.phoneNumber || "",
           createdAt: firestoreData.createdAt ? new Date(firestoreData.createdAt).toISOString() : new Date().toISOString(),
-        })
+        }).catch(console.warn) // Don't block UI for this
         
         setUserProfile(firestoreData)
       } else {
@@ -73,14 +76,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       console.error("Error fetching user profile:", error)
       
-      if (error.message?.includes("offline")) {
-        toast.error("You are offline. Some features may be limited.", { duration: 5000 })
-      } else if (error.code === "unavailable") {
-        toast.error("Failed to connect to database. Please check your internet connection.", { duration: 5000 })
-      } else {
-        toast.error("Failed to load user profile.", { duration: 5000 })
-      }
-      
       // Set a basic profile if we can't fetch from database
       setUserProfile({
         uid: currentUser.uid,
@@ -88,6 +83,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         fullName: "",
         phoneNumber: "",
       })
+      
+      if (error.message?.includes("offline")) {
+        toast.error("You are offline. Some features may be limited.", { duration: 3000 })
+      } else if (error.code === "unavailable") {
+        toast.error("Failed to connect to database. Please check your internet connection.", { duration: 3000 })
+      }
     }
   }
 
@@ -100,12 +101,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       setUser(currentUser)
       
       if (currentUser) {
-        await fetchUserProfile(currentUser)
+        // Start fetching profile immediately
+        fetchUserProfile(currentUser)
       } else {
         setUserProfile(null)
-      }
-      
-      if (isMounted) {
         setLoading(false)
       }
     })
@@ -123,7 +122,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (!navigator.onLine) {
-      toast.error("You are offline. Please check your internet connection.", { duration: 5000 })
+      toast.error("You are offline. Please check your internet connection.", { duration: 3000 })
       return
     }
 
@@ -156,9 +155,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Error updating user profile:", error)
       
       if (error.message?.includes("offline")) {
-        toast.error("You are offline. Please check your internet connection.", { duration: 5000 })
+        toast.error("You are offline. Please check your internet connection.", { duration: 3000 })
       } else if (error.code === "unavailable") {
-        toast.error("Failed to connect to database. Please check your internet connection.", { duration: 5000 })
+        toast.error("Failed to connect to database. Please check your internet connection.", { duration: 3000 })
       } else {
         toast.error("Failed to update profile.")
       }
@@ -172,7 +171,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (!navigator.onLine) {
-      toast.error("You are offline. Please check your internet connection.", { duration: 5000 })
+      toast.error("You are offline. Please check your internet connection.", { duration: 3000 })
       return
     }
 
@@ -192,11 +191,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Error deleting user account:", error)
       
       if (error.message?.includes("offline")) {
-        toast.error("You are offline. Please check your internet connection.", { duration: 5000 })
+        toast.error("You are offline. Please check your internet connection.", { duration: 3000 })
       } else if (error.code === "unavailable") {
-        toast.error("Failed to connect to database. Please check your internet connection.", { duration: 5000 })
+        toast.error("Failed to connect to database. Please check your internet connection.", { duration: 3000 })
       } else if (error.code === "auth/requires-recent-login") {
-        toast.error("Please re-authenticate to delete your account.", { duration: 5000 })
+        toast.error("Please re-authenticate to delete your account.", { duration: 3000 })
       } else {
         toast.error(`Failed to delete account: ${error.message}`)
       }
