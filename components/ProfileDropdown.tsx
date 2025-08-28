@@ -82,6 +82,12 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isLoadingVehicles, setIsLoadingVehicles] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure component only renders on client side
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // Memoize display name and avatar fallback for better performance
   const { displayName, avatarFallback } = useMemo(() => {
@@ -176,7 +182,7 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
   }
 
   const handleDeleteAccount = async () => {
-    if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+    if (typeof window !== 'undefined' && window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       await deleteUserAccount()
     }
   }
@@ -205,7 +211,7 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
   const handleDeleteBooking = async (carId: string) => {
     if (!user) return
 
-    if (window.confirm("Are you sure you want to cancel this booking?")) {
+    if (typeof window !== 'undefined' && window.confirm("Are you sure you want to cancel this booking?")) {
       try {
         const bookingRef = ref(realtimeDb, `BookingCar/${user.uid}/${carId}`)
         await remove(bookingRef)
@@ -216,6 +222,11 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
         toast.error("Failed to cancel booking")
       }
     }
+  }
+
+  // Don't render anything during server-side rendering
+  if (!isClient) {
+    return <div className="h-10 w-10 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse" />
   }
 
   if (loading && !user) {

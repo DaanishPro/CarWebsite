@@ -1,9 +1,21 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { ArrowDown, Sparkles } from "lucide-react"
 
 export default function AboutHero() {
+  const [positions, setPositions] = useState<{ x: number; y: number }[]>([])
+
+  // Generate random positions only in browser
+  useEffect(() => {
+    const newPositions = [...Array(20)].map(() => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+    }))
+    setPositions(newPositions)
+  }, [])
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
@@ -14,16 +26,13 @@ export default function AboutHero() {
 
       {/* Floating Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {positions.map((pos, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-white/20 rounded-full"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-            }}
+            initial={{ x: pos.x, y: pos.y }}
             animate={{
-              y: [null, -100, null],
+              y: [pos.y, -100, pos.y],
               opacity: [0.2, 0.8, 0.2],
             }}
             transition={{
@@ -61,8 +70,8 @@ export default function AboutHero() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-xl md:text-2xl mb-8 text-red-100 leading-relaxed max-w-3xl mx-auto"
         >
-          We're passionate innovators dedicated to transforming ideas into extraordinary experiences that make a lasting
-          impact.
+          We're passionate innovators dedicated to transforming ideas into extraordinary experiences that make a
+          lasting impact.
         </motion.p>
 
         <motion.div
