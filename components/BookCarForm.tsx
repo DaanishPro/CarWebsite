@@ -9,10 +9,28 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+<<<<<<< HEAD
 import { databaseUtils } from "@/lib/firebase"
 import { useAuth } from "@/context/AuthContext"
 import { toast } from "react-hot-toast"
 import { type CarData } from "@/components/FeatureCard"
+=======
+import { useAuth } from "@/context/AuthContext"
+import { toast } from "react-hot-toast"
+import { ref, set } from "firebase/database"
+import { realtimeDb } from "@/firebase/config" // Import realtimeDb
+
+// A more detailed CarData interface to ensure all required properties are present
+interface CarData {
+  id: string
+  name: string
+  imageSrc: string
+  price: number
+  discount: number
+  year: number
+  mainFeatures: { name: string; icon: React.ElementType }[]
+}
+>>>>>>> 5d1dd60 (Updated booked cars module)
 
 interface BookCarFormProps {
   isOpen: boolean
@@ -40,7 +58,11 @@ const CarVariants: { [key: string]: string[] } = {
   "Rolls-Royce Phantom": ["Black", "White", "Blue"],
   "Skoda Slavia": ["Red", "White", "Silver"],
   "Toyota Innova Crysta": ["White", "Silver", "Grey"],
+<<<<<<< HEAD
   "Volkswagen Virtus": ["Yellow", "Red", "White"]
+=======
+  "Volkswagen Virtus": ["Yellow", "Red", "White"],
+>>>>>>> 5d1dd60 (Updated booked cars module)
 }
 
 export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormProps) {
@@ -59,10 +81,16 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+<<<<<<< HEAD
   // This useEffect hook will update the formData state whenever carData changes.
   useEffect(() => {
     if (carData) {
       setFormData(prev => ({
+=======
+  useEffect(() => {
+    if (carData) {
+      setFormData((prev) => ({
+>>>>>>> 5d1dd60 (Updated booked cars module)
         ...prev,
         carModel: carData.name,
       }))
@@ -70,7 +98,12 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
   }, [carData])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+<<<<<<< HEAD
     const { name, value, type, checked } = e.target as HTMLInputElement
+=======
+    const { name, value, type } = e.target
+    const checked = (e.target as HTMLInputElement).checked
+>>>>>>> 5d1dd60 (Updated booked cars module)
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -79,16 +112,26 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({
+<<<<<<< HEAD
         ...prev,
         [name]: value
     }))
   }
 
+=======
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  // UPDATED: This function now saves data directly to Firebase Realtime Database
+>>>>>>> 5d1dd60 (Updated booked cars module)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
     if (!user) {
+<<<<<<< HEAD
         toast.error("You must be signed in to book a car.")
         setIsSubmitting(false)
         return
@@ -113,6 +156,61 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
     }
   }
   
+=======
+      toast.error("You must be signed in to book a car.")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (!carData || !carData.id) {
+      toast.error("Car data is missing. Please close and try again.")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (
+      !formData.fullName ||
+      !formData.phoneNumber ||
+      !formData.emailAddress ||
+      !formData.preferredVariant ||
+      !formData.bookingDate ||
+      !formData.city ||
+      !formData.paymentPreference ||
+      !formData.agreedToTerms
+    ) {
+      toast.error("Please fill in all required fields and agree to the terms.")
+      setIsSubmitting(false)
+      return
+    }
+
+    const bookingRecord = {
+      carName: carData.name,
+      carImage: carData.imageSrc,
+      carModel: carData.name,
+      carYear: String(carData.year),
+      ownerName: formData.fullName,
+      bookingDate: formData.bookingDate,
+      pickupLocation: formData.city,
+      preferredVariant: formData.preferredVariant,
+      paymentPreference: formData.paymentPreference,
+      status: "Confirmed",
+      createdAt: new Date().toISOString(),
+    }
+
+    try {
+      const bookingRef = ref(realtimeDb, `BookingCar/${user.uid}/${carData.id}`)
+      await set(bookingRef, bookingRecord)
+      toast.success(`Successfully booked the ${carData.name}!`)
+      setIsSubmitting(false)
+      onClose()
+    } catch (error) {
+      console.error("Error saving booking:", error)
+      toast.error("There was an error booking the car. Please try again.")
+      setIsSubmitting(false)
+    }
+  }
+
+>>>>>>> 5d1dd60 (Updated booked cars module)
   if (!isOpen || !carData) return null
 
   return (
@@ -152,7 +250,13 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
               <CardContent className="grid gap-4 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
+<<<<<<< HEAD
                     <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
+=======
+                    <Label htmlFor="fullName" className="text-sm font-medium">
+                      Full Name
+                    </Label>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                     <div className="relative">
                       <User2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-theme-accent-400" />
                       <Input
@@ -166,7 +270,13 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
                     </div>
                   </div>
                   <div className="space-y-2">
+<<<<<<< HEAD
                     <Label htmlFor="phoneNumber" className="text-sm font-medium">Phone Number</Label>
+=======
+                    <Label htmlFor="phoneNumber" className="text-sm font-medium">
+                      Phone Number
+                    </Label>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-theme-accent-400" />
                       <Input
@@ -183,7 +293,13 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
                 </div>
 
                 <div className="space-y-2">
+<<<<<<< HEAD
                   <Label htmlFor="emailAddress" className="text-sm font-medium">Email Address</Label>
+=======
+                  <Label htmlFor="emailAddress" className="text-sm font-medium">
+                    Email Address
+                  </Label>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-theme-accent-400" />
                     <Input
@@ -200,7 +316,13 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
+<<<<<<< HEAD
                     <Label htmlFor="carModel" className="text-sm font-medium">Car Model</Label>
+=======
+                    <Label htmlFor="carModel" className="text-sm font-medium">
+                      Car Model
+                    </Label>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                     <div className="relative">
                       <CarFront className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-theme-accent-400" />
                       <Input
@@ -213,14 +335,26 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
                     </div>
                   </div>
                   <div className="space-y-2">
+<<<<<<< HEAD
                     <Label htmlFor="preferredVariant" className="text-sm font-medium">Preferred Variant / Color</Label>
+=======
+                    <Label htmlFor="preferredVariant" className="text-sm font-medium">
+                      Preferred Variant / Color
+                    </Label>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                     <Select name="preferredVariant" onValueChange={(value) => handleSelectChange("preferredVariant", value)}>
                       <SelectTrigger className="w-full h-11 bg-theme-accent-50 dark:bg-gray-800 focus-visible:ring-offset-2 focus-visible:ring-theme-primary-500">
                         <SelectValue placeholder="Select a variant" />
                       </SelectTrigger>
                       <SelectContent>
                         {CarVariants[carData.name]?.map((variant) => (
+<<<<<<< HEAD
                           <SelectItem key={variant} value={variant}>{variant}</SelectItem>
+=======
+                          <SelectItem key={variant} value={variant}>
+                            {variant}
+                          </SelectItem>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                         ))}
                       </SelectContent>
                     </Select>
@@ -229,7 +363,13 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
+<<<<<<< HEAD
                     <Label htmlFor="bookingDate" className="text-sm font-medium">Booking Date</Label>
+=======
+                    <Label htmlFor="bookingDate" className="text-sm font-medium">
+                      Booking Date
+                    </Label>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-theme-accent-400" />
                       <Input
@@ -243,7 +383,13 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
                     </div>
                   </div>
                   <div className="space-y-2">
+<<<<<<< HEAD
                     <Label htmlFor="city" className="text-sm font-medium">City / Location</Label>
+=======
+                    <Label htmlFor="city" className="text-sm font-medium">
+                      City / Location
+                    </Label>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-theme-accent-400" />
                       <Input
@@ -257,9 +403,17 @@ export default function BookCarForm({ isOpen, onClose, carData }: BookCarFormPro
                     </div>
                   </div>
                 </div>
+<<<<<<< HEAD
                 
                 <div className="space-y-2">
                   <Label htmlFor="paymentPreference" className="text-sm font-medium">Payment Preference</Label>
+=======
+
+                <div className="space-y-2">
+                  <Label htmlFor="paymentPreference" className="text-sm font-medium">
+                    Payment Preference
+                  </Label>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                   <Select name="paymentPreference" onValueChange={(value) => handleSelectChange("paymentPreference", value)}>
                     <SelectTrigger className="w-full h-11 bg-theme-accent-50 dark:bg-gray-800 focus-visible:ring-offset-2 focus-visible:ring-theme-primary-500">
                       <SelectValue placeholder="Select an option" />

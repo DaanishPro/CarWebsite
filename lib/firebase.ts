@@ -2,16 +2,26 @@ import { ref, set, get, push, remove, onValue, off, DataSnapshot, query, orderBy
 import { realtimeDb } from "@/firebase/config";
 import { toast } from "react-hot-toast";
 
+<<<<<<< HEAD
 // User interface for database operations
+=======
+// MODIFIED: Added 'role' to the UserData interface
+>>>>>>> 5d1dd60 (Updated booked cars module)
 interface UserData {
   uid: string;
   email: string;
   fullName: string;
   phoneNumber: string;
   createdAt: string;
+<<<<<<< HEAD
 }
 
 // Contact form interface
+=======
+  role?: 'admin' | 'user'; // Add user role
+}
+
+>>>>>>> 5d1dd60 (Updated booked cars module)
 interface ContactFormData {
   name: string;
   email: string;
@@ -20,7 +30,10 @@ interface ContactFormData {
   createdAt: string;
 }
 
+<<<<<<< HEAD
 // Feature interaction interface
+=======
+>>>>>>> 5d1dd60 (Updated booked cars module)
 interface FeatureInteraction {
   userId: string;
   featureId: string;
@@ -28,7 +41,10 @@ interface FeatureInteraction {
   timestamp: string;
 }
 
+<<<<<<< HEAD
 // New interface for Booking data
+=======
+>>>>>>> 5d1dd60 (Updated booked cars module)
 interface BookingFormData {
   fullName: string;
   phoneNumber: string;
@@ -43,7 +59,10 @@ interface BookingFormData {
   createdAt: string;
 }
 
+<<<<<<< HEAD
 // Database utility functions
+=======
+>>>>>>> 5d1dd60 (Updated booked cars module)
 export const databaseUtils = {
   // Save user data to Realtime Database
   saveUserData: async (userData: UserData): Promise<boolean> => {
@@ -156,6 +175,30 @@ export const databaseUtils = {
     }
   },
 
+<<<<<<< HEAD
+=======
+  // ADDED: New function to fetch all users for the admin dashboard
+  getAllUsers: async (): Promise<UserData[]> => {
+    try {
+      if (!navigator.onLine) {
+        throw new Error("You are offline. Please check your internet connection.");
+      }
+      const usersRef = ref(realtimeDb, 'users');
+      const snapshot = await get(usersRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Convert the object of users into an array and return
+        return Object.values(data);
+      }
+      return [];
+    } catch (error: any) {
+      console.error("Error fetching all users:", error);
+      toast.error(error.message || "Failed to fetch users.");
+      return [];
+    }
+  },
+
+>>>>>>> 5d1dd60 (Updated booked cars module)
   // Save contact form data
   saveContactForm: async (formData: ContactFormData): Promise<boolean> => {
     try {

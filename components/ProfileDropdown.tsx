@@ -64,13 +64,21 @@ interface BookedCar {
   bookingDate: string
   pickupLocation: string
   status: string
+<<<<<<< HEAD
+=======
+  ownerName?: string // ADDED: To store the name from the booking form
+>>>>>>> 5d1dd60 (Updated booked cars module)
   price?: number
   discount?: number
   fuelType?: string
   mileage?: string
   transmission?: string
   location?: string
+<<<<<<< HEAD
   mainFeatures?: { name: string; icon: React.ElementType }[] // Add mainFeatures
+=======
+  mainFeatures?: { name: string; icon: React.ElementType }[]
+>>>>>>> 5d1dd60 (Updated booked cars module)
 }
 
 export default function ProfileDropdown({ isMobile = false }: ProfileDropdownProps) {
@@ -108,7 +116,11 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
           const data = snapshot.val()
           setProfileData({
             fullName: data.fullName || "",
+<<<<<<< HEAD
             phoneNo: data.phoneNo || data.phoneNumber || "", // Corrected logic to handle both "phoneNo" and "phoneNumber"
+=======
+            phoneNo: data.phoneNo || data.phoneNumber || "",
+>>>>>>> 5d1dd60 (Updated booked cars module)
             email: data.email || user.email || "",
           })
         } else {
@@ -124,12 +136,17 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
     }
   }, [user, isProfileModalOpen])
 
+<<<<<<< HEAD
   // Corrected logic to fetch user's booked vehicles and enrich data
+=======
+  // UPDATED: Fetches user's booked vehicles and enriches data, including ownerName
+>>>>>>> 5d1dd60 (Updated booked cars module)
   useEffect(() => {
     if (user && isVehiclesModalOpen) {
       setIsLoadingVehicles(true)
       const bookingsRef = ref(realtimeDb, `BookingCar/${user.uid}`)
 
+<<<<<<< HEAD
       const unsubscribe = onValue(bookingsRef, (snapshot) => {
         if (snapshot.exists()) {
           const userBookingsData = snapshot.val()
@@ -166,6 +183,48 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
         toast.error("Failed to load your bookings")
         setIsLoadingVehicles(false)
       })
+=======
+      const unsubscribe = onValue(
+        bookingsRef,
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const userBookingsData = snapshot.val()
+            const userBookings: BookedCar[] = Object.keys(userBookingsData).map((carId) => {
+              const booking = userBookingsData[carId]
+              const carDetails = allCars.find((car) => car.id === carId)
+
+              return {
+                carId,
+                carName: carDetails?.name || booking.carName || "Unknown Car",
+                carImage: carDetails?.imageSrc || booking.carImage || "/placeholder.png?height=120&width=180",
+                carModel: carDetails?.name || booking.carModel || "",
+                carYear: carDetails?.year ? String(carDetails.year) : booking.carYear || "",
+                bookingDate: booking.bookingDate || booking.date || "Date not specified",
+                pickupLocation: booking.pickupLocation || booking.location || "Location not specified",
+                status: booking.status || "Confirmed",
+                ownerName: booking.ownerName || "", // ADDED: Get ownerName from booking data
+                price: carDetails?.price || booking.price || 0,
+                discount: carDetails?.discount || booking.discount || 0,
+                fuelType: carDetails?.fuelType || booking.fuelType || "Petrol",
+                mileage: carDetails?.mileage || booking.mileage || "N/A",
+                transmission: carDetails?.transmission || booking.transmission || "Manual",
+                location: carDetails?.location || booking.location || "Mumbai",
+                mainFeatures: carDetails?.mainFeatures || [],
+              }
+            })
+            setBookedCars(userBookings)
+          } else {
+            setBookedCars([])
+          }
+          setIsLoadingVehicles(false)
+        },
+        (error) => {
+          console.error("Error loading bookings:", error)
+          toast.error("Failed to load your bookings")
+          setIsLoadingVehicles(false)
+        }
+      )
+>>>>>>> 5d1dd60 (Updated booked cars module)
 
       return () => off(bookingsRef, "value", unsubscribe)
     }
@@ -182,7 +241,11 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
   }
 
   const handleDeleteAccount = async () => {
+<<<<<<< HEAD
     if (typeof window !== 'undefined' && window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+=======
+    if (typeof window !== "undefined" && window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+>>>>>>> 5d1dd60 (Updated booked cars module)
       await deleteUserAccount()
     }
   }
@@ -211,7 +274,11 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
   const handleDeleteBooking = async (carId: string) => {
     if (!user) return
 
+<<<<<<< HEAD
     if (typeof window !== 'undefined' && window.confirm("Are you sure you want to cancel this booking?")) {
+=======
+    if (typeof window !== "undefined" && window.confirm("Are you sure you want to cancel this booking?")) {
+>>>>>>> 5d1dd60 (Updated booked cars module)
       try {
         const bookingRef = ref(realtimeDb, `BookingCar/${user.uid}/${carId}`)
         await remove(bookingRef)
@@ -224,7 +291,10 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
     }
   }
 
+<<<<<<< HEAD
   // Don't render anything during server-side rendering
+=======
+>>>>>>> 5d1dd60 (Updated booked cars module)
   if (!isClient) {
     return <div className="h-10 w-10 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse" />
   }
@@ -243,18 +313,29 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
+<<<<<<< HEAD
             className={`relative h-12 w-12 rounded-full p-0 hover:bg-red-50 hover:border-red-300 border-2 border-red-200 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-white ${isMobile ? "w-full justify-start h-16 px-4" : ""
               }`}
           >
             <div>
               <Avatar className="h-10 w-10 ring-2 ring-red-500 hover:ring-red-600 transition-all duration-300 shadow-lg">
                 <AvatarImage src="/placeholder.svg?height=40&width=40" alt={displayName} className="object-cover" />
+=======
+            className={`relative h-12 w-12 rounded-full p-0 hover:bg-red-50 hover:border-red-300 border-2 border-red-200 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-white ${
+              isMobile ? "w-full justify-start h-16 px-4" : ""
+            }`}
+          >
+            <div>
+              <Avatar className="h-10 w-10 ring-2 ring-red-500 hover:ring-red-600 transition-all duration-300 shadow-lg">
+                <AvatarImage src={user.photoURL || undefined} alt={displayName} className="object-cover" />
+>>>>>>> 5d1dd60 (Updated booked cars module)
                 <AvatarFallback className="bg-gradient-to-br from-red-600 to-red-800 font-bold text-lg text-white">
                   {avatarFallback}
                 </AvatarFallback>
               </Avatar>
               {isMobile && <span className="ml-4 text-base font-semibold text-gray-800">{displayName}</span>}
 
+<<<<<<< HEAD
               {
                 (userProfile?.fullName || profileData?.fullName) && (
                   <div className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full p-1.5 shadow-lg ring-2 ring-white">
@@ -262,6 +343,13 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
                   </div>
                 )
               }
+=======
+              {(userProfile?.fullName || profileData?.fullName) && (
+                <div className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full p-1.5 shadow-lg ring-2 ring-white">
+                  <Crown className="h-4 w-4 text-white fill-current" />
+                </div>
+              )}
+>>>>>>> 5d1dd60 (Updated booked cars module)
             </div>
           </Button>
         </DropdownMenuTrigger>
@@ -276,7 +364,11 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
             <div className="flex flex-col space-y-4">
               <div className="flex items-center gap-4">
                 <Avatar className="h-16 w-16 ring-4 ring-red-100 shadow-lg">
+<<<<<<< HEAD
                   <AvatarImage src="/placeholder.svg?height=64&width=64" alt={displayName} className="object-cover" />
+=======
+                  <AvatarImage src={user.photoURL || undefined} alt={displayName} className="object-cover" />
+>>>>>>> 5d1dd60 (Updated booked cars module)
                   <AvatarFallback className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 text-white font-bold text-2xl">
                     {avatarFallback}
                   </AvatarFallback>
@@ -474,6 +566,10 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
           </DialogContent>
         </Dialog>
 
+<<<<<<< HEAD
+=======
+        {/* My Vehicles Modal */}
+>>>>>>> 5d1dd60 (Updated booked cars module)
         <Dialog open={isVehiclesModalOpen} onOpenChange={setIsVehiclesModalOpen}>
           <DialogContent className="sm:max-w-[800px] p-0 max-h-[85vh] overflow-hidden">
             <div className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 p-8 text-white relative overflow-hidden">
@@ -502,9 +598,13 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
                     <Car className="h-12 w-12 text-red-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">No Bookings Found</h3>
+<<<<<<< HEAD
                   <p className="text-gray-600 text-lg">
                     You haven't booked any vehicles yet. Start exploring our amazing collection!
                   </p>
+=======
+                  <p className="text-gray-600 text-lg">You haven't booked any vehicles yet. Start exploring our amazing collection!</p>
+>>>>>>> 5d1dd60 (Updated booked cars module)
                 </div>
               ) : (
                 <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
@@ -533,6 +633,16 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
                                 <p className="text-base text-gray-600 font-medium">
                                   {car.carModel} ({car.carYear})
                                 </p>
+<<<<<<< HEAD
+=======
+                                {/* ADDED: Display for owner name */}
+                                {car.ownerName && (
+                                  <div className="flex items-center gap-2 mt-2 text-gray-700">
+                                    <User className="h-4 w-4 text-red-600 flex-shrink-0" />
+                                    <span className="font-medium text-sm">Booked by: {car.ownerName}</span>
+                                  </div>
+                                )}
+>>>>>>> 5d1dd60 (Updated booked cars module)
                               </div>
                               <Button
                                 variant="destructive"
@@ -567,7 +677,10 @@ export default function ProfileDropdown({ isMobile = false }: ProfileDropdownPro
                               )}
                             </div>
 
+<<<<<<< HEAD
                             {/* Displaying main features */}
+=======
+>>>>>>> 5d1dd60 (Updated booked cars module)
                             {car.mainFeatures && car.mainFeatures.length > 0 && (
                               <div className="mt-4">
                                 <h5 className="font-semibold text-gray-800 mb-2">Key Features</h5>
