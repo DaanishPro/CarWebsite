@@ -14,16 +14,7 @@ import { useAuth } from "@/context/AuthContext"
 import { toast } from "react-hot-toast"
 import { ref, set } from "firebase/database"
 import { realtimeDb } from "@/firebase/config"
-
-interface CarData {
-  id: string
-  name: string
-  imageSrc: string
-  price: number
-  discount?: number
-  year: number
-  mainFeatures: { name: string; icon: React.ElementType }[]
-}
+import { type CarData } from "@/components/FeatureCard"
 
 interface BookCarFormProps {
   isOpen: boolean

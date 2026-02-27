@@ -13,7 +13,7 @@ import { databaseUtils } from "@/lib/firebase"
 
 interface Feature {
   name: string
-  icon?: React.ElementType
+  icon: React.ElementType
 }
 
 export interface CarData {
